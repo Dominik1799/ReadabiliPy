@@ -37,7 +37,7 @@ def have_node():
     return os.path.exists(node_modules)
 
 
-def simple_json_from_html_string(html, content_digests=False, node_indexes=False, use_readability=False):
+def simple_json_from_html_string(html, content_digests=False, node_indexes=False, use_readability=False, use_is_probably_readable=False):
     if use_readability and not have_node():
         print("Warning: node executable not found, reverting to pure-Python mode. Install Node.js v10 or newer to use Readability.js.", file=sys.stderr)
         use_readability = False
@@ -52,8 +52,14 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
         # Call Mozilla's Readability.js Readability.parse() function via node, writing output to a temporary file
         article_json_path = f_html.name + ".json"
         jsdir = os.path.join(os.path.dirname(__file__), 'javascript')
-        subprocess.check_call(
-            ["node", "ExtractArticle.js", "-i", html_path, "-o", article_json_path], cwd=jsdir)
+        js_file = "ExtractArticle.js" if not use_is_probably_readable else "ExtractArticleIfReadable.js"
+        try:
+            subprocess.check_call(
+                    ["node", js_file, "-i", html_path, "-o", article_json_path], cwd=jsdir)
+        except subprocess.CalledProcessError as e:
+            print(e)
+            return None
+            
 
         # Read output of call to Readability.parse() from JSON file and return as Python dictionary
         with open(article_json_path, "r", encoding="utf-8") as json_file:

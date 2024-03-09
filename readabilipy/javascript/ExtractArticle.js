@@ -5,6 +5,10 @@
 const fs = require('fs');
 const { Readability } = require('@mozilla/readability');
 const { JSDOM } = require('jsdom');
+const { exit } = require('process');
+
+
+
 
 function readFile(filePath) {
 	return fs.readFileSync(filePath, {encoding: "utf-8"}).trim();
@@ -19,7 +23,7 @@ function main() {
 	var argv = require('minimist')(process.argv.slice(2));
 	if (argv['i'] === undefined) {
 		console.log("Input file required.");
-		return 1;
+		return exit(1);
 	}
 
 	var inFilePath = argv['i'];

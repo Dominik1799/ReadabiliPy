@@ -5,6 +5,7 @@
 const fs = require('fs');
 const { isProbablyReaderable } = require('@mozilla/readability');
 const { JSDOM } = require('jsdom');
+const { exit } = require('process');
 
 function readFile(filePath) {
 	return fs.readFileSync(filePath, {encoding: "utf-8"}).trim();
@@ -26,7 +27,7 @@ function main() {
 	if (isProbablyReaderable(doc.window.document, { minScore: 20 })) {
 		return 0;
 	} else {
-		return 1;
+		return exit(1);
 	}
 }
 
